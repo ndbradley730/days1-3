@@ -1,3 +1,11 @@
+class Claim:
+    def __init__(self, claim_id, x, y, width, height):
+        self.claim_id = claim_id
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
 def parse_claim(claim):
     parts = claim.split(' ')
 
@@ -11,7 +19,7 @@ def parse_claim(claim):
     width = int(width_height_parts[0])
     height = int(width_height_parts[1])
 
-    return claim_id, x, y, width, height
+    return Claim(claim_id, x, y, width, height)
 
 def get_claims():
     with open('day3-input.txt', 'r') as f:
@@ -20,21 +28,21 @@ def get_claims():
 
 def get_fabric_with_claims():
     fabric = []
-    for claim_id, x, y, width, height in get_claims():
+    for claim in get_claims():
         # Adjust fabric size
-        if len(fabric) < x + width:
-            for _ in range(x + width - len(fabric)):
+        if len(fabric) < claim.x + claim.width:
+            for _ in range(claim.x + claim.width - len(fabric)):
                 fabric.append([])
 
         # At each x point, adjust fabric size
-        for ix in range(x, x + width):
-            if len(fabric[ix]) < y + height:
-                for _ in range(y + height - len(fabric[ix])):
+        for ix in range(claim.x, claim.x + claim.width):
+            if len(fabric[ix]) < claim.y + claim.height:
+                for _ in range(claim.y + claim.height - len(fabric[ix])):
                     fabric[ix].append(0)
 
         # Add in claims
-        for ix in range(x, x + width):
-            for iy in range(y, y + height):
+        for ix in range(claim.x, claim.x + claim.width):
+            for iy in range(claim.y, claim.y + claim.height):
                 fabric[ix][iy] += 1
 
     return fabric
@@ -50,16 +58,16 @@ def part1():
 
 def part2():
     fabric = get_fabric_with_claims()
-    for claim_id, x, y, width, height in get_claims():
+    for claim in get_claims():
         found_overlap = False
 
-        for ix in range(x, x + width):
+        for ix in range(claim.x, claim.x + claim.width):
             if found_overlap:
                 break
-            for iy in range(y, y + height):
+            for iy in range(claim.y, claim.y + claim.height):
                 if fabric[ix][iy] > 1:
                     found_overlap = True
                     break
 
         if not found_overlap:
-            return claim_id
+            return claim.claim_id
